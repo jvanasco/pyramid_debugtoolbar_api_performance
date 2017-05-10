@@ -1,0 +1,31 @@
+<p>
+	performance logging is available for this request as a CSV via the link below:
+</p>
+
+
+<h5>Timing</h5>
+<p>
+	<a 	href="/_debug_toolbar/api-performance/timing-${pdtb_id}.csv"
+	    class="btn btn-primary"
+	>
+		<span class="glyphicon glyphicon-download" aria-hidden="true"></span>
+		&nbsp;
+		Download Timing as CSV
+	</a>
+</p>
+<hr/>
+
+<h5>Function Calls</h5>
+<p>
+	% if stats:
+		<a 	href="/_debug_toolbar/api-performance/function_calls-${pdtb_id}.csv"
+			class="btn btn-primary"
+		>
+			<span class="glyphicon glyphicon-download" aria-hidden="true"></span>
+			&nbsp;
+			Download Function Calls as CSV
+		</a>
+	% else:
+		The profiler was not activated for this request. Activate the checkbox in the toolbar to use it.
+	% endif
+</p>
