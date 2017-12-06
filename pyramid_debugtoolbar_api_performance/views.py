@@ -7,10 +7,7 @@ from pyramid.response import Response
 from pyramid.view import view_config
 from pyramid.exceptions import NotFound
 
-# pyramid_debugtoolbar
-from pyramid_debugtoolbar.utils import find_request_history
-
-# lcoal
+# local
 from .utils import get_performance_panel
 
 
@@ -19,7 +16,7 @@ from .utils import get_performance_panel
 
 def _standardized_setup(request):
     """returns panel after some processing"""
-    history = find_request_history(request)
+    history = request.pdtb_history
     try:
         last_request_pair = history.last(1)[0]
     except IndexError:

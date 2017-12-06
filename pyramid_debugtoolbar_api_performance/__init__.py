@@ -2,6 +2,9 @@
 from .panels import PerformanceCsvDebugPanel
 
 
+__VERSION__ = '0.1.1'
+
+
 # ==============================================================================
 
 
