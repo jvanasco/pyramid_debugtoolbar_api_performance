@@ -18,7 +18,9 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, "README.md")).read()
 README = README.split("\n\n", 1)[0] + "\n"
 
-requires = ['pyramid_debugtoolbar>=4.0', ]
+requires = ['pyramid_debugtoolbar>=4.0',
+            'six',
+            ]
 
 setup(
     name="pyramid_debugtoolbar_api_performance",
@@ -33,6 +35,8 @@ setup(
         "Intended Audience :: Developers",
         "Framework :: Pyramid",
         "Programming Language :: Python",
+        "Programming Language :: Python :: 2",
+        "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
     ],
     long_description=README,

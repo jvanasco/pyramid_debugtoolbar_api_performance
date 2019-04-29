@@ -1,3 +1,7 @@
+v0.2.0
+2019.04.29
+* python3 support
+
 v0.1.1
 2017.12.06
 * ported a functionality to current debugtoolbar api

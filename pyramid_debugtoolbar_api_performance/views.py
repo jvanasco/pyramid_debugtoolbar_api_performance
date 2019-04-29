@@ -1,11 +1,14 @@
 # stdlib
 import csv
-import StringIO
 
 # pyramid
 from pyramid.response import Response
 from pyramid.view import view_config
 from pyramid.exceptions import NotFound
+
+# pypi
+import six
+from six.moves import StringIO
 
 # local
 from .utils import get_performance_panel
