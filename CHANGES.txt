@@ -1,3 +1,7 @@
+v0.2.1
+bugfixes
+includeme registers the panel via the api method `config.add_debugtoolbar_panel()`
+
 v0.2.0
 2019.04.29
 * python3 support

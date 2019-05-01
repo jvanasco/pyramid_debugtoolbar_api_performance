@@ -47,7 +47,7 @@ def csv_timing(request):
      panel,
      ) = _standardized_setup(request)
 
-    csvfile = StringIO.StringIO()
+    csvfile = StringIO()
     csvwriter = csv.writer(csvfile)
     for row in panel.data['timing_rows']:
         # row is `label, timing`
@@ -74,7 +74,7 @@ def csv_function_calls(request):
      panel,
      ) = _standardized_setup(request)
 
-    csvfile = StringIO.StringIO()
+    csvfile = StringIO()
     csvwriter = csv.writer(csvfile)
     if panel.data['stats']:
         csvwriter.writerow(('Calls',
