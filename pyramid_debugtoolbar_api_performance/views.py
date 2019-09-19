@@ -28,7 +28,7 @@ def _standardized_setup(request):
     else:
         last_request_id = last_request_pair[0]
 
-    request_id = request.matchdict.get('request_id', last_request_id)
+    request_id = request.matchdict.get("request_id", last_request_id)
     toolbar = history.get(request_id, None)
 
     if not toolbar:
@@ -41,15 +41,13 @@ def _standardized_setup(request):
     return request_id, panel
 
 
-@view_config(route_name='debugtoolbar.api_performance_csv.timing')
+@view_config(route_name="debugtoolbar.api_performance_csv.timing")
 def csv_timing(request):
-    (request_id,
-     panel,
-     ) = _standardized_setup(request)
+    (request_id, panel) = _standardized_setup(request)
 
     csvfile = StringIO()
     csvwriter = csv.writer(csvfile)
-    for row in panel.data['timing_rows']:
+    for row in panel.data["timing_rows"]:
         # row is `label, timing`
         # example:
         # 'timing_rows': (('User CPU time', '119.678 msec'),
@@ -60,42 +58,35 @@ def csv_timing(request):
         #                 )
         csvwriter.writerow(row)
     csvfile.seek(0)
-    as_csv = Response(content_type='text/csv',
-                      body_file=csvfile,
-                      status=200,
-                      )
-    as_csv.headers['Content-Disposition'] = str('attachment; filename= performance-timing-%s.csv' % request_id)
+    as_csv = Response(content_type="text/csv", body_file=csvfile, status=200)
+    as_csv.headers["Content-Disposition"] = str(
+        "attachment; filename= performance-timing-%s.csv" % request_id
+    )
     return as_csv
 
 
-@view_config(route_name='debugtoolbar.api_performance_csv.function_calls')
+@view_config(route_name="debugtoolbar.api_performance_csv.function_calls")
 def csv_function_calls(request):
-    (request_id,
-     panel,
-     ) = _standardized_setup(request)
+    (request_id, panel) = _standardized_setup(request)
 
     csvfile = StringIO()
     csvwriter = csv.writer(csvfile)
-    if panel.data['stats']:
-        csvwriter.writerow(('Calls',
-                            'Total',
-                            'Percall',
-                            'Cumu',
-                            'CumuPer',
-                            'Func',
-                            ))
-        for row in panel.data['function_calls']:
-            csvwriter.writerow((row['ncalls'],
-                                row['tottime'],
-                                row['percall'],
-                                row['cumtime'],
-                                row['percall_cum'],
-                                row['filename_long'],
-                                ))
+    if panel.data["stats"]:
+        csvwriter.writerow(("Calls", "Total", "Percall", "Cumu", "CumuPer", "Func"))
+        for row in panel.data["function_calls"]:
+            csvwriter.writerow(
+                (
+                    row["ncalls"],
+                    row["tottime"],
+                    row["percall"],
+                    row["cumtime"],
+                    row["percall_cum"],
+                    row["filename_long"],
+                )
+            )
     csvfile.seek(0)
-    as_csv = Response(content_type='text/csv',
-                      body_file=csvfile,
-                      status=200,
-                      )
-    as_csv.headers['Content-Disposition'] = str('attachment; filename= performance-function_calls-%s.csv' % request_id)
+    as_csv = Response(content_type="text/csv", body_file=csvfile, status=200)
+    as_csv.headers["Content-Disposition"] = str(
+        "attachment; filename= performance-function_calls-%s.csv" % request_id
+    )
     return as_csv
