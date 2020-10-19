@@ -1,5 +1,6 @@
 # stdlib
 import csv
+import os
 
 # pyramid
 from pyramid.response import Response
@@ -8,10 +9,16 @@ from pyramid.exceptions import NotFound
 
 # pypi
 import six
-from six.moves import StringIO
+
+# from six import BytesIO
+from six import StringIO
 
 # local
 from .utils import get_performance_panel
+
+
+# encoding used to write filedata
+ENCODING = os.environ.get("pyramid_debugtoolbar_api_sqlalchemy_encoding", "utf-8")
 
 
 # ==============================================================================
@@ -58,7 +65,9 @@ def csv_timing(request):
         #                 )
         csvwriter.writerow(row)
     csvfile.seek(0)
-    as_csv = Response(content_type="text/csv", body_file=csvfile, status=200)
+    as_csv = Response(
+        content_type="text/csv", body=csvfile.read(), status=200, charset=ENCODING
+    )
     as_csv.headers["Content-Disposition"] = str(
         "attachment; filename= performance-timing-%s.csv" % request_id
     )
@@ -85,7 +94,9 @@ def csv_function_calls(request):
                 )
             )
     csvfile.seek(0)
-    as_csv = Response(content_type="text/csv", body_file=csvfile, status=200)
+    as_csv = Response(
+        content_type="text/csv", body=csvfile.read(), status=200, charset=ENCODING
+    )
     as_csv.headers["Content-Disposition"] = str(
         "attachment; filename= performance-function_calls-%s.csv" % request_id
     )

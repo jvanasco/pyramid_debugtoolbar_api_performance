@@ -1,8 +1,10 @@
-v0.2.2dev
+v0.3.0
+* updated debugtoolbar includes
+
+v0.2.2dev unreleased
 black
 	* upgraded black; 20.8b1
 	* integrated with pre-commit
-
 
 v0.2.1
 bugfixes

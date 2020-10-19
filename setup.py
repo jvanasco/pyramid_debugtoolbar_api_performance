@@ -15,16 +15,15 @@ with open(
     VERSION = re.compile(r'.*__VERSION__ = "(.*?)"', re.S).match(v_file.read()).group(1)
 
 here = os.path.abspath(os.path.dirname(__file__))
-README = open(os.path.join(here, "README.md")).read()
-README = README.split("\n\n", 1)[0] + "\n"
+README = open(os.path.join(here, "README.rst")).read()
 
 requires = [
+    "pyramid",
     "pyramid_debugtoolbar>=4.0",
     "six",
 ]
 tests_require = [
     "pytest",
-    "pyramid",
 ]
 testing_extras = tests_require + []
 
@@ -34,7 +33,7 @@ setup(
     author_email="jonathan@findmeon.com",
     url="https://github.com/jvanasco/pyramid_debugtoolbar_api_performance",
     version=VERSION,
-    description="performance exporting for pyramid_debugtoolbar",
+    description="performance csv exporting for pyramid_debugtoolbar",
     keywords="web pyramid",
     license="MIT",
     classifiers=[
