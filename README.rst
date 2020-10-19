@@ -1,5 +1,5 @@
 pyramid_debugtoolbar_api_performance
-===================================
+====================================
 
 .. image:: https://github.com/jvanasco/pyramid_debugtoolbar_api_performance/workflows/Python%20package/badge.svg
         :alt: Build Status
@@ -13,15 +13,15 @@ This package is designed for application profile and to be a useful part of test
 suites, allowing developers to run a series of tests and log the Performance
 performance.
 
-It exposes two routes for csvs:
+The package exposes two routes for CSV data:
 
 * timing
 * function_calls
 
-Both correlate to the official Performance panel
+Both correlate to the official Performance panel data.
 
 The urls are generated in a machine-friendly format, so you can regex the
-`request_id` off a page and pull it from the API.  This is explained below
+`request_id` off a page and pull it from the API.  This is explained below...
 
 
 NOTES:
