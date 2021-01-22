@@ -1,21 +1,21 @@
 """pyramid_debugtoolbar_api_performance installation script.
 """
 import os
+import re
 from setuptools import setup
 from setuptools import find_packages
 
 # store version in the init.py
-import re
+HERE = os.path.abspath(os.path.dirname(__file__))
 
 with open(
-    os.path.join(
-        os.path.dirname(__file__), "pyramid_debugtoolbar_api_performance", "__init__.py"
-    )
+    os.path.join(HERE, "pyramid_debugtoolbar_api_performance", "__init__.py")
 ) as v_file:
     VERSION = re.compile(r'.*__VERSION__ = "(.*?)"', re.S).match(v_file.read()).group(1)
 
-here = os.path.abspath(os.path.dirname(__file__))
-README = open(os.path.join(here, "README.rst")).read()
+long_description = description = "performance csv exporting for pyramid_debugtoolbar"
+with open(os.path.join(HERE, "README.rst")) as fp:
+    long_description = fp.read()
 
 requires = [
     "pyramid",
@@ -33,7 +33,9 @@ setup(
     author_email="jonathan@findmeon.com",
     url="https://github.com/jvanasco/pyramid_debugtoolbar_api_performance",
     version=VERSION,
-    description="performance csv exporting for pyramid_debugtoolbar",
+    description=description,
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     keywords="web pyramid",
     license="MIT",
     classifiers=[
@@ -44,7 +46,6 @@ setup(
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
     ],
-    long_description=README,
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
