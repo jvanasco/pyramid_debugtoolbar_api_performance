@@ -1,3 +1,6 @@
+v0.3.1
+* packaging
+
 v0.3.0
 * updated debugtoolbar includes
 

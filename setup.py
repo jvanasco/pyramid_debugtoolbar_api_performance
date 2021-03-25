@@ -9,7 +9,7 @@ from setuptools import find_packages
 HERE = os.path.abspath(os.path.dirname(__file__))
 
 with open(
-    os.path.join(HERE, "pyramid_debugtoolbar_api_performance", "__init__.py")
+    os.path.join(HERE, "src", "pyramid_debugtoolbar_api_performance", "__init__.py")
 ) as v_file:
     VERSION = re.compile(r'.*__VERSION__ = "(.*?)"', re.S).match(v_file.read()).group(1)
 
@@ -37,6 +37,11 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     keywords="web pyramid",
+    packages=find_packages(
+        where="src",
+    ),
+    package_dir={"": "src"},
+    include_package_data=True,
     license="MIT",
     classifiers=[
         "Intended Audience :: Developers",
@@ -46,8 +51,6 @@ setup(
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
     ],
-    packages=find_packages(),
-    include_package_data=True,
     zip_safe=False,
     install_requires=requires,
     tests_require=tests_require,
