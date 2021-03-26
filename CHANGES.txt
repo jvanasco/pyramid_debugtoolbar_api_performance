@@ -1,3 +1,6 @@
+unreleased
+* added tests/__init__.py
+
 v0.3.1
 * packaging
 
