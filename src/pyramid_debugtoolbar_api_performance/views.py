@@ -1,16 +1,17 @@
 # stdlib
 import csv
 import os
+import re
 
 # pyramid
 from pyramid.response import Response
+
+from pyramid.request import Request
+from pyramid_debugtoolbar.panels.performance import PerformanceDebugPanel
 from pyramid.view import view_config
 from pyramid.exceptions import NotFound
 
-# pypi
-import six
-
-# from six import BytesIO
+# Python 2's csv module requires a byte buffer.
 from six import StringIO
 
 # local
@@ -25,31 +26,37 @@ ENCODING = os.environ.get("pyramid_debugtoolbar_api_sqlalchemy_encoding", "utf-8
 
 
 def _standardized_setup(request):
-    """returns panel after some processing"""
-    history = request.pdtb_history
-    try:
-        last_request_pair = history.last(1)[0]
-    except IndexError:
-        last_request_pair = None
-        last_request_id = None
-    else:
-        last_request_id = last_request_pair[0]
-
-    request_id = request.matchdict.get("request_id", last_request_id)
-    toolbar = history.get(request_id, None)
-
-    if not toolbar:
+    # type: (Request) -> tuple[str, PerformanceDebugPanel]
+    """Resolve the performance panel for the requested history entry."""
+    request_id = request.matchdict["request_id"]
+    toolbar = request.pdtb_history.get(request_id, None)
+    if toolbar is None:
         raise NotFound
 
     panel = get_performance_panel(toolbar.panels)
-    if not panel:
+    if panel is None or not panel.data:
         raise NotFound
 
     return request_id, panel
 
 
+def _csv_response(csvfile, report, request_id):
+    # type: (StringIO, str, str) -> Response
+    """Return a CSV attachment with a header-safe filename."""
+    safe_id = re.sub(r"[^a-zA-Z0-9_-]", "_", request_id)
+    filename = "performance-%s-%s.csv" % (report, safe_id)
+    response = Response(
+        content_type="text/csv", body=csvfile.getvalue(), charset=ENCODING
+    )
+    response.headers["Content-Disposition"] = str('attachment; filename="%s"' % filename)
+    response.cache_control.no_store = True
+    return response
+
+
 @view_config(route_name="debugtoolbar.api_performance_csv.timing")
 def csv_timing(request):
+    # type: (Request) -> Response
+    """Export timing rows for a recorded request."""
     (request_id, panel) = _standardized_setup(request)
 
     csvfile = StringIO()
@@ -64,18 +71,13 @@ def csv_timing(request):
         #                 ('Context switches', '19 voluntary, 1233 involuntary')
         #                 )
         csvwriter.writerow(row)
-    csvfile.seek(0)
-    as_csv = Response(
-        content_type="text/csv", body=csvfile.read(), status=200, charset=ENCODING
-    )
-    as_csv.headers["Content-Disposition"] = str(
-        "attachment; filename= performance-timing-%s.csv" % request_id
-    )
-    return as_csv
+    return _csv_response(csvfile, "timing", request_id)
 
 
 @view_config(route_name="debugtoolbar.api_performance_csv.function_calls")
 def csv_function_calls(request):
+    # type: (Request) -> Response
+    """Export profiler rows for a recorded request."""
     (request_id, panel) = _standardized_setup(request)
 
     csvfile = StringIO()
@@ -93,11 +95,4 @@ def csv_function_calls(request):
                     row["filename_long"],
                 )
             )
-    csvfile.seek(0)
-    as_csv = Response(
-        content_type="text/csv", body=csvfile.read(), status=200, charset=ENCODING
-    )
-    as_csv.headers["Content-Disposition"] = str(
-        "attachment; filename= performance-function_calls-%s.csv" % request_id
-    )
-    return as_csv
+    return _csv_response(csvfile, "function_calls", request_id)
