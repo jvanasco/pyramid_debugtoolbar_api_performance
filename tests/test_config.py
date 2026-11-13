@@ -172,3 +172,49 @@ class TestDebugtoolbarPanel(unittest.TestCase):
             )
             request.remote_addr = "127.0.0.1"
             self.assertEqual(request.get_response(app).status_code, 404)
+
+
+    def test_spreadsheet_exports(self):
+        # type: () -> None
+        """Protect both CSV text fields while preserving default output."""
+        from pyramid_debugtoolbar.panels.performance import PerformanceDebugPanel
+
+        app = self.config.make_wsgi_app()
+        initial = Request.blank("/")
+        initial.remote_addr = "127.0.0.1"
+        initial.get_response(app)
+        request_id, toolbar = self.config.registry.pdtb_history.last(1)[0]
+        panel = next(p for p in toolbar.panels if isinstance(p, PerformanceDebugPanel))
+        panel.data.update(
+            timing_rows=[(str("=label"), str("-2 msec"))],
+            stats=True,
+            function_calls=[
+                dict(
+                    ncalls="1",
+                    tottime="-2",
+                    percall="3",
+                    cumtime="4",
+                    percall_cum="5",
+                    filename_long=" @module",
+                )
+            ],
+        )
+
+        for report, raw, safe in (
+            ("timing", "=label,-2 msec", "'=label,-2 msec"),
+            ("function_calls", "1,-2,3,4,5, @module", "1,-2,3,4,5,' @module"),
+        ):
+            path = "/_debug_toolbar/api-performance/%s-%s.csv" % (report, request_id)
+            for query, row in (("", raw), ("?spreadsheet=1", safe)):
+                request = Request.blank(path + query)
+                request.remote_addr = "127.0.0.1"
+                response = request.get_response(app)
+                self.assertEqual(response.status_code, 200)
+                self.assertIn(row + "\r\n", response.text)
+                self.assertTrue(response.cache_control.no_store)
+                if query:
+                    self.assertTrue(
+                        response.headers["Content-Disposition"].endswith(
+                            '-spreadsheet.csv"'
+                        )
+                    )
