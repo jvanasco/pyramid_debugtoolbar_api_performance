@@ -1,8 +1,6 @@
 # local
 from .panels import PerformanceCsvDebugPanel
-
-
-__VERSION__ = "1.0.0"
+from ._version import __VERSION__
 
 
 # ==============================================================================
