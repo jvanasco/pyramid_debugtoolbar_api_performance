@@ -1,4 +1,6 @@
-unreleased
+v1.0.0
+* Keep runtime dependencies out of version discovery on legacy setuptools.
+* Consolidate package and tox configuration and extend CI through Python 3.15.
 * Harden CSV download headers and disable caching for profiling exports.
 * Return 404 when a request or its performance data is unavailable.
 * added tests/__init__.py
