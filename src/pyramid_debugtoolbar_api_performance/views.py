@@ -12,9 +12,10 @@ from pyramid.view import view_config
 from pyramid.exceptions import NotFound
 
 # Python 2's csv module requires a byte buffer.
-from six import StringIO
+from six import PY2, StringIO, binary_type
 
 # local
+from .spreadsheet_utils import sanitize_spreadsheet_cell
 from .utils import get_performance_panel
 
 
@@ -40,11 +41,21 @@ def _standardized_setup(request):
     return request_id, panel
 
 
-def _csv_response(csvfile, report, request_id):
-    # type: (StringIO, str, str) -> Response
+def _spreadsheet_text(value):
+    # type: (str) -> str
+    """Sanitize a CSV text field using the export's encoding."""
+    if isinstance(value, binary_type):
+        value = value.decode(ENCODING)
+    value = sanitize_spreadsheet_cell(value)
+    return value.encode(ENCODING) if PY2 else value
+
+
+def _csv_response(csvfile, report, request_id, spreadsheet):
+    # type: (StringIO, str, str, bool) -> Response
     """Return a CSV attachment with a header-safe filename."""
     safe_id = re.sub(r"[^a-zA-Z0-9_-]", "_", request_id)
-    filename = "performance-%s-%s.csv" % (report, safe_id)
+    suffix = "-spreadsheet" if spreadsheet else ""
+    filename = "performance-%s-%s%s.csv" % (report, safe_id, suffix)
     response = Response(
         content_type="text/csv", body=csvfile.getvalue(), charset=ENCODING
     )
@@ -59,19 +70,14 @@ def csv_timing(request):
     """Export timing rows for a recorded request."""
     (request_id, panel) = _standardized_setup(request)
 
+    spreadsheet = request.GET.get("spreadsheet") == "1"
     csvfile = StringIO()
     csvwriter = csv.writer(csvfile)
-    for row in panel.data["timing_rows"]:
-        # row is `label, timing`
-        # example:
-        # 'timing_rows': (('User CPU time', '119.678 msec'),
-        #                 ('System CPU time', '64.695 msec'),
-        #                 ('Total CPU time', '184.373 msec'),
-        #                 ('Elapsed time', '205.099 msec'),
-        #                 ('Context switches', '19 voluntary, 1233 involuntary')
-        #                 )
-        csvwriter.writerow(row)
-    return _csv_response(csvfile, "timing", request_id)
+    for label, timing in panel.data["timing_rows"]:
+        if spreadsheet:
+            label = _spreadsheet_text(label)
+        csvwriter.writerow((label, timing))
+    return _csv_response(csvfile, "timing", request_id, spreadsheet)
 
 
 @view_config(route_name="debugtoolbar.api_performance_csv.function_calls")
@@ -80,11 +86,15 @@ def csv_function_calls(request):
     """Export profiler rows for a recorded request."""
     (request_id, panel) = _standardized_setup(request)
 
+    spreadsheet = request.GET.get("spreadsheet") == "1"
     csvfile = StringIO()
     csvwriter = csv.writer(csvfile)
     if panel.data["stats"]:
         csvwriter.writerow(("Calls", "Total", "Percall", "Cumu", "CumuPer", "Func"))
         for row in panel.data["function_calls"]:
+            filename = row["filename_long"]
+            if spreadsheet:
+                filename = _spreadsheet_text(filename)
             csvwriter.writerow(
                 (
                     row["ncalls"],
@@ -92,7 +102,7 @@ def csv_function_calls(request):
                     row["percall"],
                     row["cumtime"],
                     row["percall_cum"],
-                    row["filename_long"],
+                    filename,
                 )
             )
-    return _csv_response(csvfile, "function_calls", request_id)
+    return _csv_response(csvfile, "function_calls", request_id, spreadsheet)

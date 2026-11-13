@@ -1,3 +1,6 @@
+v1.1.0
+* Add spreadsheet=1 to both performance CSV routes to prefix formula-like text.
+
 v1.0.0
 * Explicitly package the CSV template as data to avoid setuptools package discovery warnings.
 * Keep runtime dependencies out of version discovery on legacy setuptools.
