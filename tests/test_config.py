@@ -7,7 +7,6 @@ import unittest
 
 # pyramid testing requirements
 from pyramid import testing
-from pyramid.exceptions import ConfigurationError
 from pyramid.response import Response
 from pyramid.request import Request
 
@@ -41,6 +40,7 @@ class TestDebugtoolbarPanel(unittest.TestCase):
             )
 
         config.add_view(empty_view)
+        config.add_notfound_view(lambda request: Response(status=404))
 
     def tearDown(self):
         testing.tearDown()
@@ -132,6 +132,14 @@ class TestDebugtoolbarPanel(unittest.TestCase):
         req3.remote_addr = "127.0.0.1"
         resp3 = req3.get_response(app)
         self.assertEqual(resp3.status_code, 200)
+        self.assertEqual(
+            resp3.headers["Content-Disposition"],
+            'attachment; filename="performance-timing-%s.csv"' % _id,
+        )
+        self.assertTrue(resp3.cache_control.no_store)
+        denied = Request.blank(_timing_link)
+        denied.remote_addr = "192.0.2.1"
+        self.assertEqual(denied.get_response(app).status_code, 404)
         self.assertTrue(resp3.text.startswith("User CPU time,"))
 
         # function csv
@@ -142,6 +150,25 @@ class TestDebugtoolbarPanel(unittest.TestCase):
         req4.remote_addr = "127.0.0.1"
         resp4 = req4.get_response(app)
         self.assertEqual(resp4.status_code, 200)
+        self.assertEqual(
+            resp4.headers["Content-Disposition"],
+            'attachment; filename="performance-function_calls-%s.csv"' % _id,
+        )
+        self.assertTrue(resp4.cache_control.no_store)
+        denied = Request.blank(_function_link)
+        denied.remote_addr = "192.0.2.1"
+        self.assertEqual(denied.get_response(app).status_code, 404)
         self.assertTrue(
             resp4.text.startswith("Calls,Total,Percall,Cumu,CumuPer,Func\r\n")
         )
+
+    def test_csv_missing_history(self):
+        # type: () -> None
+        """Both CSV routes return 404 when the request is absent from history."""
+        app = self.config.make_wsgi_app()
+        for report in ("timing", "function_calls"):
+            request = Request.blank(
+                "/_debug_toolbar/api-performance/%s-missing.csv" % report
+            )
+            request.remote_addr = "127.0.0.1"
+            self.assertEqual(request.get_response(app).status_code, 404)

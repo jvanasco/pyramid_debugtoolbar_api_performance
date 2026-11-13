@@ -1,4 +1,6 @@
 unreleased
+* Harden CSV download headers and disable caching for profiling exports.
+* Return 404 when a request or its performance data is unavailable.
 * added tests/__init__.py
 
 v0.3.1

@@ -30,7 +30,7 @@ testing_extras = tests_require + []
 setup(
     name="pyramid_debugtoolbar_api_performance",
     author="Jonathan Vanasco",
-    author_email="jonathan@findmeon.com",
+    author_email="jvanasco@2xlp.com",
     url="https://github.com/jvanasco/pyramid_debugtoolbar_api_performance",
     version=VERSION,
     description=description,
