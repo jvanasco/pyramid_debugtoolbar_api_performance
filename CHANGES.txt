@@ -1,4 +1,5 @@
 v1.0.0
+* Explicitly package the CSV template as data to avoid setuptools package discovery warnings.
 * Keep runtime dependencies out of version discovery on legacy setuptools.
 * Consolidate package and tox configuration and extend CI through Python 3.15.
 * Harden CSV download headers and disable caching for profiling exports.
@@ -12,24 +13,20 @@ v0.3.0
 * updated debugtoolbar includes
 
 v0.2.2dev unreleased
-black
-	* upgraded black; 20.8b1
-	* integrated with pre-commit
+* black
+  * upgraded black; 20.8b1
+  * integrated with pre-commit
 
 v0.2.1
-bugfixes
-includeme registers the panel via the api method `config.add_debugtoolbar_panel()`
+* bugfixes
+  * includeme registers the panel via the api method `config.add_debugtoolbar_panel()`
 
-v0.2.0
-2019.04.29
+v0.2.0 | 2019.04.29
 * python3 support
 
-v0.1.1
-2017.12.06
+v0.1.1 | 2017.12.06
 * ported a functionality to current debugtoolbar api
 * store version as __VERSION__ in /__init__.py
 
-v0.1.0
-2017.05.10
+v0.1.0 | 2017.05.10
 * initial
-
